@@ -4,26 +4,25 @@ import des.DES;
 import utils.Constants;
 import utils.Utils;
 
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 
 public class MAC {
+    /**
+     * HMAC Algorithm.
+     */
+    public static String authenticate(String message, BigInteger key) throws NoSuchAlgorithmException {
 
-    public static String authenticate(String message, long key) {
-        List<Long> blocks = Utils.splitTextIntoBlocks(message, Constants.MAC_BLOCK_SIZE);
+        // Apply HMAC using SHA-1 as the hash function.
+        BigInteger oKeyPad = key.xor(BigInteger.valueOf(0x5C * Constants.SHA_INTERNAL_BLOCK_SIZE));
+        BigInteger iKeyPad = key.xor(BigInteger.valueOf(0x36 * Constants.SHA_INTERNAL_BLOCK_SIZE));
 
-        long mac = 0;
-
-        for (long block : blocks) {
-            mac ^= block;
-        }
-
-        mac = DES.encrypt(mac, key);
-
-        return Utils.blockToStr(mac, Constants.MAC_BLOCK_SIZE);
+        return SHA1.hash(oKeyPad.toString(16) + SHA1.hash(iKeyPad.toString(16) + message));
     }
 
-    public static boolean verify(String message, long key) {
+    public static boolean verify(String message, BigInteger key) throws NoSuchAlgorithmException {
         if (message.length() <= Constants.MAC_BLOCK_SIZE) {
             return false;
         }

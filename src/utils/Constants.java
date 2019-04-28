@@ -1,5 +1,7 @@
 package utils;
 
+import java.math.BigInteger;
+
 public class Constants {
 
     /**
@@ -13,14 +15,19 @@ public class Constants {
     public static final int SERVER_PORT = 3000;
 
     /**
-     * The block size used in calculating the MAC.
+     * The SHA-1 Internal block size in bytes.
      */
-    public static final int MAC_BLOCK_SIZE = 8;
+    public static final int SHA_INTERNAL_BLOCK_SIZE = 64; // SHA-1 internal 64 Bytes.
+
+    /**
+     * The block size used in calculating the MAC in hex digits.
+     */
+    public static final int MAC_BLOCK_SIZE = 40; // Our SHA-1 output representation is in Hex so the length is 160/4 = 40 digits.
 
     /**
      * The private key for MAC algorithm.
      */
-    public static final long MAC_PRIVATE_KEY = 98751321035460001L;
+    public static final BigInteger MAC_PRIVATE_KEY = BigInteger.valueOf(98751321035460001L);
 
     /**
      * Enum of different modes of operation of DES encryption/decryption algorithm.
@@ -115,7 +122,7 @@ public class Constants {
      */
     public static final int[] PC_2 = {
             14, 17, 11, 24, 1, 5, 3, 28,
-            15, 6, 21, 10,23, 19, 12, 4,
+            15, 6, 21, 10, 23, 19, 12, 4,
             26, 8, 16, 7, 27, 20, 13, 2,
             41, 52, 31, 37, 47, 55, 30, 40,
             51, 45, 33, 48, 44, 49, 39, 56,

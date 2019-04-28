@@ -4,6 +4,7 @@ import mac.MAC;
 import utils.Constants;
 import utils.Utils;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 
@@ -19,7 +20,7 @@ public class Crypt extends DES {
      *
      * @return the encrypted message in hexadecimal format.
      */
-    public static String encrypt(String message, long key, Constants.DESMode mode) {
+    public static String encrypt(String message, long key, Constants.DESMode mode) throws NoSuchAlgorithmException {
         message = message + MAC.authenticate(message, Constants.MAC_PRIVATE_KEY);
 
         switch (mode) {
@@ -48,7 +49,7 @@ public class Crypt extends DES {
      *
      * @return the decrypted message.
      */
-    public static String decrypt(String ciphertext, long key, Constants.DESMode mode) {
+    public static String decrypt(String ciphertext, long key, Constants.DESMode mode) throws NoSuchAlgorithmException {
         String message = "";
 
         switch (mode) {
