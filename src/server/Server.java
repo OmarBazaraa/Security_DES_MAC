@@ -1,6 +1,7 @@
 package server;
 
 import des.Crypt;
+import des.DESConfig;
 import utils.Constants;
 import utils.Constants.*;
 
@@ -36,7 +37,7 @@ public class Server {
         private Scanner in;
         private PrintWriter out;
 
-        public static DESMode mode = DESMode.UNKNOWN;
+        public DESConfig config = new DESConfig();
 
 
         public ServerThread(Socket socket, int clientNumber) throws IOException {
@@ -54,7 +55,7 @@ public class Server {
 
         public void run() {
             try {
-                receiveEncryptionMode();
+                receiveEncryptionConfig();
                 communicate();
             } catch (Exception ex) {
                 System.out.println("Error handling client #" + clientNumber + ": " + ex.getMessage());
@@ -73,7 +74,7 @@ public class Server {
             while (in.hasNext()) {
                 // Receive and decrypt the message from the client
                 String ciphertext = in.nextLine();
-                String message = Crypt.decrypt(ciphertext, Constants.PRIVATE_KEY, mode);
+                String message = Crypt.decrypt(ciphertext, config);
 
                 // Print plain and ciphered message
                 System.out.println("Received from Client #" + clientNumber + ":");
@@ -83,20 +84,14 @@ public class Server {
             }
         }
 
-        private void receiveEncryptionMode() throws Exception {
+        private void receiveEncryptionConfig() throws Exception {
             try {
-                int opt = Integer.parseInt(in.nextLine());
-
-                if (opt < 0 || opt > 4) {
-                    throw new Exception();
-                }
-
-                mode = DESMode.values()[opt];
+                config.receive(in);
             } catch (Exception ex) {
-                throw new Exception("Received invalid encryption mode!");
+                throw new Exception(ex.getMessage());
             }
 
-            switch (mode) {
+            switch (config.mode) {
                 case ELECTRONIC_CODEBOOK:
                     System.out.println("Connected with client #" + clientNumber + " in ECB mode.\n");
                     break;

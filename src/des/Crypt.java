@@ -15,25 +15,24 @@ public class Crypt extends DES {
      * with the given private key.
      *
      * @param message a string of characters to encrypt.
-     * @param key     a 64-bit private key.
-     * @param mode    a DES mode of operation.
+     * @param config  DES configurations object
      *
      * @return the encrypted message in hexadecimal format.
      */
-    public static String encrypt(String message, long key, Constants.DESMode mode) throws NoSuchAlgorithmException {
+    public static String encrypt(String message, DESConfig config) throws NoSuchAlgorithmException {
         message = message + MAC.authenticate(message, Constants.MAC_PRIVATE_KEY);
 
-        switch (mode) {
+        switch (config.mode) {
             case ELECTRONIC_CODEBOOK:
-                return encryptECB(message, key);
+                return encryptECB(message, config.privateKey);
             case CIPHER_BLOCK_CHAINING:
-                return encryptCBC(message, key);
+                return encryptCBC(message, config.privateKey, config.getInitialVector());
             case CIPHER_FEEDBACK:
-                return encryptCFB(message, key, 1);
+                return encryptCFB(message, config.privateKey, config.getInitialVector(), config.blockSize);
             case OUTPUT_FEEDBACK:
-                return encryptOFB(message, key, Constants.INITIAL_VECTOR);
+                return encryptOFB(message, config.privateKey, config.getInitialVector());
             case COUNTER:
-                return encryptCTR(message, key);
+                return encryptCTR(message, config.privateKey);
         }
 
         return "";
@@ -44,29 +43,28 @@ public class Crypt extends DES {
      * with the given private key.
      *
      * @param ciphertext a string of encrypted message in hexadecimal format to decrypt.
-     * @param key        a 64-bit private key.
-     * @param mode       a DES mode of operation.
+     * @param config     DES configurations object
      *
      * @return the decrypted message.
      */
-    public static String decrypt(String ciphertext, long key, Constants.DESMode mode) throws NoSuchAlgorithmException {
+    public static String decrypt(String ciphertext, DESConfig config) throws NoSuchAlgorithmException {
         String message = "";
 
-        switch (mode) {
+        switch (config.mode) {
             case ELECTRONIC_CODEBOOK:
-                message = decryptECB(ciphertext, key);
+                message = decryptECB(ciphertext, config.privateKey);
                 break;
             case CIPHER_BLOCK_CHAINING:
-                message = decryptCBC(ciphertext, key);
+                message = decryptCBC(ciphertext, config.privateKey, config.getInitialVector());
                 break;
             case CIPHER_FEEDBACK:
-                message = decryptCFB(ciphertext, key, 1);
+                message = decryptCFB(ciphertext, config.privateKey, config.getInitialVector(), config.blockSize);
                 break;
             case OUTPUT_FEEDBACK:
-                message = decryptOFB(ciphertext, key, Constants.INITIAL_VECTOR);
+                message = decryptOFB(ciphertext, config.privateKey, config.getInitialVector());
                 break;
             case COUNTER:
-                message = decryptCTR(ciphertext, key);
+                message = decryptCTR(ciphertext, config.privateKey);
                 break;
         }
 
@@ -129,14 +127,15 @@ public class Crypt extends DES {
      *
      * @param message a string of characters to encrypt.
      * @param key     a 64-bit private key.
+     * @param IV      a 64-bit initial vector.
      *
      * @return the encrypted message in hexadecimal format.
      */
-    public static String encryptCBC(String message, long key) {
+    public static String encryptCBC(String message, long key, long IV) {
         StringBuilder ret = new StringBuilder();
         List<Long> blocks = Utils.splitTextIntoBlocks(message, 8);
 
-        long vec = Constants.INITIAL_VECTOR;
+        long vec = IV;
 
         for (long block : blocks) {
             long cipherBlock = encrypt(block ^ vec, key);
@@ -153,14 +152,15 @@ public class Crypt extends DES {
      *
      * @param ciphertext a string of encrypted message in hexadecimal format to decrypt.
      * @param key        a 64-bit private key.
+     * @param IV         a 64-bit initial vector.
      *
      * @return the decrypted message.
      */
-    public static String decryptCBC(String ciphertext, long key) {
+    public static String decryptCBC(String ciphertext, long key, long IV) {
         StringBuilder ret = new StringBuilder();
         List<Long> cipherBlocks = Utils.splitHexIntoBlocks(ciphertext, 8);
 
-        long vec = Constants.INITIAL_VECTOR;
+        long vec = IV;
 
         for (long cipherBlock : cipherBlocks) {
             long block = decrypt(cipherBlock, key) ^ vec;
@@ -179,15 +179,16 @@ public class Crypt extends DES {
      *
      * @param message   a string of characters to encrypt.
      * @param key       a 64-bit private key.
+     * @param IV        a 64-bit initial vector.
      * @param blockSize the block size (in bytes).
      *
      * @return the encrypted message in hexadecimal format.
      */
-    public static String encryptCFB(String message, long key, int blockSize) {
+    public static String encryptCFB(String message, long key, long IV, int blockSize) {
         StringBuilder ret = new StringBuilder();
         List<Long> blocks = Utils.splitTextIntoBlocks(message, blockSize);
 
-        long vec = Constants.INITIAL_VECTOR;
+        long vec = IV;
 
         for (long block : blocks) {
             long enc = encrypt(vec, key) >>> ((8 - blockSize) * 8);
@@ -205,15 +206,16 @@ public class Crypt extends DES {
      *
      * @param ciphertext a string of encrypted message in hexadecimal format to decrypt.
      * @param key        a 64-bit private key.
+     * @param IV         a 64-bit initial vector.
      * @param blockSize  the block size (in bytes).
      *
      * @return the decrypted message.
      */
-    public static String decryptCFB(String ciphertext, long key, int blockSize) {
+    public static String decryptCFB(String ciphertext, long key, long IV, int blockSize) {
         StringBuilder ret = new StringBuilder();
         List<Long> cipherBlocks = Utils.splitHexIntoBlocks(ciphertext, blockSize);
 
-        long vec = Constants.INITIAL_VECTOR;
+        long vec = IV;
 
         for (long cipherBlock : cipherBlocks) {
             long enc = encrypt(vec, key) >>> ((8 - blockSize) * 8);

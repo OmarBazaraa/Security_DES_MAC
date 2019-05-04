@@ -1,20 +1,17 @@
 package mac;
 
-import des.DES;
 import utils.Constants;
-import utils.Utils;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 
+/**
+ * HMAC Algorithm.
+ */
 public class MAC {
-    /**
-     * HMAC Algorithm.
-     */
-    public static String authenticate(String message, BigInteger key) throws NoSuchAlgorithmException {
 
+    public static String authenticate(String message, BigInteger key) throws NoSuchAlgorithmException {
         // Apply HMAC using SHA-1 as the hash function.
         BigInteger oKeyPad = key.xor(BigInteger.valueOf(0x5C * Constants.SHA_INTERNAL_BLOCK_SIZE));
         BigInteger iKeyPad = key.xor(BigInteger.valueOf(0x36 * Constants.SHA_INTERNAL_BLOCK_SIZE));

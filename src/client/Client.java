@@ -1,6 +1,7 @@
 package client;
 
 import des.Crypt;
+import des.DESConfig;
 import utils.Constants;
 import utils.Constants.*;
 
@@ -18,13 +19,13 @@ public class Client {
     public static Scanner in;
     public static PrintWriter out;
 
-    public static DESMode mode = DESMode.UNKNOWN;
+    public static DESConfig config;
 
 
     public static void main(String[] args) {
         try {
             init();
-            chooseEncryptionMode();
+            chooseEncryptionConfig();
             communicate();
         } catch (Exception ex) {
             System.err.println("Error: " + ex.getMessage());
@@ -67,7 +68,7 @@ public class Client {
             }
 
             // Encrypt the message
-            String ciphertext = Crypt.encrypt(message, Constants.PRIVATE_KEY, mode);
+            String ciphertext = Crypt.encrypt(message, config);
 
             // Print plain and ciphered message
             System.out.println("     Plaintext: " + message);
@@ -79,8 +80,8 @@ public class Client {
         }
     }
 
-    public static void chooseEncryptionMode() {
-        mode = DESMode.UNKNOWN;
+    public static void chooseEncryptionConfig() {
+        DESMode mode = DESMode.UNKNOWN;
 
         // Ask the user to choose encryption mode
         do {
@@ -95,13 +96,15 @@ public class Client {
                 int opt = Integer.parseInt(scanner.nextLine()) - 1;
 
                 if (opt < 0 || opt > 4) {
-                    throw new Exception();
+                    throw new Exception("Invalid mode...\n");
                 }
 
                 mode = DESMode.values()[opt];
-                out.println(opt);
+                config = new DESConfig(mode);
+                config.read(scanner);
+                config.send(out);
             } catch (Exception ex) {
-                System.out.println("Invalid encryption mode...\n");
+                System.out.println(ex.getMessage());
             }
         } while (mode == DESMode.UNKNOWN);
     }
