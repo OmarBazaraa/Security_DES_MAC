@@ -19,7 +19,7 @@ public class Client {
     public static Scanner in;
     public static PrintWriter out;
 
-    public static DESConfig config;
+    public static DESConfig config = new DESConfig();
 
 
     public static void main(String[] args) {
@@ -85,27 +85,15 @@ public class Client {
 
         // Ask the user to choose encryption mode
         do {
-            System.out.println("Please choose encryption mode:");
-            System.out.println("    1. EBC - Electronic Codebook");
-            System.out.println("    2. CBC - Cipher Block Chaining");
-            System.out.println("    3. CFB - Cipher Feedback");
-            System.out.println("    4. OFB - Output Feedback");
-            System.out.println("    5. CTR - Counter");
+
 
             try {
-                int opt = Integer.parseInt(scanner.nextLine()) - 1;
-
-                if (opt < 0 || opt > 4) {
-                    throw new Exception("Invalid mode...\n");
-                }
-
-                mode = DESMode.values()[opt];
                 config = new DESConfig(mode);
                 config.read(scanner);
                 config.send(out);
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
-        } while (mode == DESMode.UNKNOWN);
+        } while (config.mode == DESMode.UNKNOWN);
     }
 }
