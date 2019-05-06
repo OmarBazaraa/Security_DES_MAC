@@ -1,5 +1,6 @@
 package des;
 
+import utils.Constants;
 import utils.Constants.*;
 
 import java.io.PrintWriter;
@@ -17,7 +18,7 @@ public class DESConfig {
     /**
      * The private key used for DES encryption/decryption.
      */
-    public long privateKey = 1086899994387671129L;
+    public long privateKey = Constants.PRIVATE_KEY;
 
     /**
      * The private seed used to generate initial vectors and nonce for various DES modes.
@@ -28,7 +29,7 @@ public class DESConfig {
      * The block size used in DES Cipher Feedback Mode (CFB), measured in number of bytes.
      * Must be a number between [1, 8].
      */
-    public int blockSize = 1;
+    public int blockSize = 8;
 
     /**
      * Random number generator.

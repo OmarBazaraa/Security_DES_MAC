@@ -3,7 +3,13 @@ import numpy as np
 
 # matplotlib.style.use('ggplot')
 
-modes = ['Electronic code book', 'Cipher block chaining', 'Cipher feedback', 'Output feedback', 'Counter']
+modes = [
+	'ECB: Electronic Codebook',
+	'CBC: Cipher Block Chaining',
+	'CFB: Cipher Feedback',
+	'OFB: Output Feedback',
+	'CTR: Counter'
+]
 
 arr = []
 with open('../../out/DES_BLOCK_MODES.txt') as f:
@@ -26,8 +32,10 @@ p5 = plt.bar(ind, arr[:, 4], width, bottom=arr[:, 0] + arr[:, 1] + arr[:, 2] + a
 
 plt.xticks(ind, x_labels)
 
-plt.ylabel('Encryption time. in msec.')
-plt.title('Encryption time with different character count in thousands.')
+plt.xlabel('message length (in thousands chars)')
+plt.ylabel('encryption time (in msec)')
+plt.title('encryption time vs message length')
+
 plt.legend((p1[0], p2[0], p3[0], p4[0], p5[0]), modes)
 
 plt.show()
@@ -47,7 +55,8 @@ ind = [i for i in range(1, 9)]  # the x locations for the groups
 width = 0.35  # the width of the bars: can also be len(x) sequence
 
 p1 = plt.bar(ind, arr[1, :], width)
-plt.ylabel('Encryption time. in msec')
-plt.title('Cypher feedback with different block sizes keeping msg size constant')
+plt.xlabel('block size (in bytes)')
+plt.ylabel('encryption time (in msec)')
+plt.title('CFB encryption time vs block size')
 
 plt.show()

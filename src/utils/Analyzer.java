@@ -31,37 +31,51 @@ public class Analyzer {
         String line = reader.readLine();
         while (line != null) {
             messages.add(line.trim());
-
-            // read next line
             line = reader.readLine();
         }
         reader.close();
 
+
+        // Open text file to write statistics into.
         BufferedWriter outputWriter = null;
         outputWriter = new BufferedWriter(new FileWriter("out/DES_BLOCK_MODES.txt"));
+
+        // Write messages lengths.
+        for (String msg : messages) {
+            outputWriter.write(Long.toString(msg.length()) + ' ');
+        }
+        outputWriter.newLine();
 
         //
         // Run Analysis.
         //
-        for (String msg : messages)
-            outputWriter.write(Long.toString(msg.length()) + ' ');
-        outputWriter.newLine();
-
-        DESConfig config = new DESConfig();
-
         for (String msg : messages) {
             for (Constants.DESMode mode : Constants.DESMode.values()) {
-                if (mode == UNKNOWN)
+                if (mode == UNKNOWN) {
                     continue;
-
-                config.mode = mode;
+                }
 
                 long s = System.currentTimeMillis();
 
-                Crypt.encrypt(msg, config);
+                switch (mode) {
+                    case ELECTRONIC_CODEBOOK:
+                        encryptECB(msg, Constants.PRIVATE_KEY);
+                        break;
+                    case CIPHER_BLOCK_CHAINING:
+                        encryptCBC(msg, Constants.PRIVATE_KEY, Constants.INITIAL_VECTOR);
+                        break;
+                    case CIPHER_FEEDBACK:
+                        encryptCFB(msg, Constants.PRIVATE_KEY, Constants.INITIAL_VECTOR, 8);
+                        break;
+                    case OUTPUT_FEEDBACK:
+                        encryptOFB(msg, Constants.PRIVATE_KEY, Constants.INITIAL_VECTOR);
+                        break;
+                    case COUNTER:
+                        encryptCTR(msg, Constants.PRIVATE_KEY);
+                        break;
+                }
 
                 s = System.currentTimeMillis() - s;
-
                 outputWriter.write(Long.toString(s) + ' ');
             }
             outputWriter.newLine();
@@ -76,17 +90,16 @@ public class Analyzer {
         //
         int[] blockSizes = new int[]{1, 2, 3, 4, 5, 6, 7, 8};
         outputWriter = new BufferedWriter(new FileWriter("out/CIPHER_FEEDBACK.txt"));
-        config.mode = CIPHER_FEEDBACK;
 
-        for (int bs : blockSizes)
+        for (int bs : blockSizes) {
             outputWriter.write(Long.toString(bs) + ' ');
+        }
         outputWriter.newLine();
 
         for (int bs : blockSizes) {
             long s = System.currentTimeMillis();
-            config.blockSize = bs;
 
-            Crypt.encrypt(messages.get(5), config);
+            encryptCFB(messages.get(5), Constants.PRIVATE_KEY, Constants.INITIAL_VECTOR, bs);
 
             s = System.currentTimeMillis() - s;
             outputWriter.write(Long.toString(s) + ' ');
@@ -96,5 +109,4 @@ public class Analyzer {
         outputWriter.flush();
         outputWriter.close();
     }
-
 }
