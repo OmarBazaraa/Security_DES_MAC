@@ -43,7 +43,7 @@ with open('../../out/CIPHER_FEEDBACK.txt') as f:
 arr = np.asarray(arr, dtype=np.int).reshape((2, 8))
 
 plt.figure()
-ind = np.arange(8)  # the x locations for the groups
+ind = [i for i in range(1, 9)]  # the x locations for the groups
 width = 0.35  # the width of the bars: can also be len(x) sequence
 
 p1 = plt.bar(ind, arr[1, :], width)
