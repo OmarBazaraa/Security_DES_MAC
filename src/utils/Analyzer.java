@@ -8,6 +8,7 @@ import java.lang.module.Configuration;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static des.Crypt.*;
 import static des.Crypt.encryptCTR;
@@ -65,7 +66,7 @@ public class Analyzer {
                         encryptCBC(msg, Constants.PRIVATE_KEY, Constants.INITIAL_VECTOR);
                         break;
                     case CIPHER_FEEDBACK:
-                        encryptCFB(msg, Constants.PRIVATE_KEY, Constants.INITIAL_VECTOR, 8);
+                        encryptCFB(msg, Constants.PRIVATE_KEY, Constants.INITIAL_VECTOR, 4);
                         break;
                     case OUTPUT_FEEDBACK:
                         encryptOFB(msg, Constants.PRIVATE_KEY, Constants.INITIAL_VECTOR);
