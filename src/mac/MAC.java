@@ -13,8 +13,8 @@ public class MAC {
 
     public static String authenticate(String message, BigInteger key) throws NoSuchAlgorithmException {
         // Apply HMAC using SHA-1 as the hash function.
-        BigInteger oKeyPad = key.xor(BigInteger.valueOf(0x5C * Constants.SHA_INTERNAL_BLOCK_SIZE));
-        BigInteger iKeyPad = key.xor(BigInteger.valueOf(0x36 * Constants.SHA_INTERNAL_BLOCK_SIZE));
+        BigInteger oKeyPad = key.xor(BigInteger.valueOf(0x5C5C5C5C5C5C5C5CL));
+        BigInteger iKeyPad = key.xor(BigInteger.valueOf(0x3636363636363636L));
 
         return SHA1.hash(oKeyPad.toString(16) + SHA1.hash(iKeyPad.toString(16) + message));
     }

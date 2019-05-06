@@ -15,11 +15,6 @@ public class Constants {
     public static final int SERVER_PORT = 3000;
 
     /**
-     * The SHA-1 Internal block size in bytes.
-     */
-    public static final int SHA_INTERNAL_BLOCK_SIZE = 64; // SHA-1 internal 64 Bytes.
-
-    /**
      * The block size used in calculating the MAC in hex digits.
      */
     public static final int MAC_BLOCK_SIZE = 40; // Our SHA-1 output representation is in Hex so the length is 160/4 = 40 digits.
