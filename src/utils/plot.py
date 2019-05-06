@@ -31,3 +31,23 @@ plt.title('Encryption time with different character count in thousands.')
 plt.legend((p1[0], p2[0], p3[0], p4[0], p5[0]), modes)
 
 plt.show()
+
+# Cypher feedback graph
+
+arr = []
+
+with open('../../out/CIPHER_FEEDBACK.txt') as f:
+    lines = [l.rstrip() for l in f.readlines()]
+    arr.append([l.split() for l in lines])
+
+arr = np.asarray(arr, dtype=np.int).reshape((2, 8))
+
+plt.figure()
+ind = np.arange(8)  # the x locations for the groups
+width = 0.35  # the width of the bars: can also be len(x) sequence
+
+p1 = plt.bar(ind, arr[1, :], width)
+plt.ylabel('Encryption time. in msec')
+plt.title('Cypher feedback with different block sizes keeping msg size constant')
+
+plt.show()

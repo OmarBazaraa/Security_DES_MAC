@@ -61,6 +61,7 @@ public class Analyzer {
                 Crypt.encrypt(msg, config);
 
                 s = System.currentTimeMillis() - s;
+
                 outputWriter.write(Long.toString(s) + ' ');
             }
             outputWriter.newLine();
@@ -68,5 +69,32 @@ public class Analyzer {
 
         outputWriter.flush();
         outputWriter.close();
+
+
+        //
+        // Cipher feedback graph points generation.
+        //
+        int[] blockSizes = new int[]{1, 2, 3, 4, 5, 6, 7, 8};
+        outputWriter = new BufferedWriter(new FileWriter("out/CIPHER_FEEDBACK.txt"));
+        config.mode = CIPHER_FEEDBACK;
+
+        for (int bs : blockSizes)
+            outputWriter.write(Long.toString(bs) + ' ');
+        outputWriter.newLine();
+
+        for (int bs : blockSizes) {
+            long s = System.currentTimeMillis();
+            config.blockSize = bs;
+
+            Crypt.encrypt(messages.get(5), config);
+
+            s = System.currentTimeMillis() - s;
+            outputWriter.write(Long.toString(s) + ' ');
+        }
+        outputWriter.newLine();
+
+        outputWriter.flush();
+        outputWriter.close();
     }
+
 }
