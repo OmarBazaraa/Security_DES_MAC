@@ -1,6 +1,11 @@
 package utils;
 
+import des.Crypt;
+import des.DESConfig;
+
 import java.io.*;
+import java.lang.module.Configuration;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,16 +17,15 @@ import static utils.Constants.DESMode.*;
 
 public class Analyzer {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
         analyze();
     }
 
-    public static void analyze() throws IOException {
+    public static void analyze() throws IOException, NoSuchAlgorithmException {
         //
         // Different messages with different lengths.
         //
         List<String> messages = new ArrayList<>();
-        List<Integer> messagesLengths = new ArrayList<>();
 
         BufferedReader reader = new BufferedReader(new FileReader("in/msgs.txt"));
         String line = reader.readLine();
@@ -34,60 +38,30 @@ public class Analyzer {
         reader.close();
 
         BufferedWriter outputWriter = null;
-        outputWriter = new BufferedWriter(new FileWriter("out/vals.txt"));
-
-        //
-        // Get Messages lengths.
-        //
-        for (String msg : messages) {
-            messagesLengths.add(messages.get(0).length());
-            Integer s = messages.get(0).length();
-            outputWriter.write(s.toString() + ' ');
-        }
-        outputWriter.newLine();
+        outputWriter = new BufferedWriter(new FileWriter("out/DES_BLOCK_MODES.txt"));
 
         //
         // Run Analysis.
         //
-        int[] blockSizes = new int[]{1, 8, 16, 32, 64, 128, 512};
+        for (String msg : messages)
+            outputWriter.write(Long.toString(msg.length()) + ' ');
+        outputWriter.newLine();
 
-        List<Long> ecb = new ArrayList<>();
-        List<Long> cbc = new ArrayList<>();
-        List<Long> cfb = new ArrayList<>();
-        List<Long> ofb = new ArrayList<>();
-        List<Long> cnt = new ArrayList<>();
+        DESConfig config = new DESConfig();
 
-        for (int bs : blockSizes) {
+        for (String msg : messages) {
             for (Constants.DESMode mode : Constants.DESMode.values()) {
-                if (mode == UNKNOWN) {
+                if (mode == UNKNOWN)
                     continue;
-                }
 
-                Long s = System.currentTimeMillis();
+                config.mode = mode;
 
-                if (mode == ELECTRONIC_CODEBOOK) {
-                    encryptECB(messages.get(0), Constants.PRIVATE_KEY);
-                    s = System.currentTimeMillis() - s;
-                    ecb.add(s);
-                } else if (mode == CIPHER_BLOCK_CHAINING) {
-                    encryptCBC(messages.get(0), Constants.PRIVATE_KEY, Constants.INITIAL_VECTOR);
-                    s = System.currentTimeMillis() - s;
-                    cbc.add(s);
-                } else if (mode == CIPHER_FEEDBACK) {
-                    encryptCFB(messages.get(0), Constants.PRIVATE_KEY, Constants.INITIAL_VECTOR, bs);
-                    s = System.currentTimeMillis() - s;
-                    cfb.add(s);
-                } else if (mode == OUTPUT_FEEDBACK) {
-                    encryptOFB(messages.get(0), Constants.PRIVATE_KEY, Constants.INITIAL_VECTOR);
-                    s = System.currentTimeMillis() - s;
-                    ofb.add(s);
-                } else if (mode == COUNTER) {
-                    encryptCTR(messages.get(0), Constants.PRIVATE_KEY);
-                    s = System.currentTimeMillis() - s;
-                    cnt.add(s);
-                }
+                long s = System.currentTimeMillis();
 
-                outputWriter.write(s.toString() + ' ');
+                Crypt.encrypt(msg, config);
+
+                s = System.currentTimeMillis() - s;
+                outputWriter.write(Long.toString(s) + ' ');
             }
             outputWriter.newLine();
         }
